@@ -1,0 +1,253 @@
+@import "tailwindcss";
+
+:root {
+  /* 平成プロフィール帳 パステル多色パレット */
+  --background: #ffeef5;
+  --foreground: #4a2a3a;
+  --paper: #fffdf2;
+
+  --pink: #ff6fa9;
+  --pink-soft: #ffd1e3;
+  --mint: #6ee0c8;
+  --mint-soft: #c5f3e6;
+  --lavender: #c89dff;
+  --lavender-soft: #e6d5ff;
+  --yellow: #ffd84d;
+  --yellow-soft: #fff1a8;
+  --sky: #88d4ff;
+  --sky-soft: #d0eeff;
+  --rule: #ffe0ec;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-paper: var(--paper);
+  --color-pink: var(--pink);
+  --color-pink-soft: var(--pink-soft);
+  --color-mint: var(--mint);
+  --color-mint-soft: var(--mint-soft);
+  --color-lavender: var(--lavender);
+  --color-lavender-soft: var(--lavender-soft);
+  --color-yellow: var(--yellow);
+  --color-yellow-soft: var(--yellow-soft);
+  --color-sky: var(--sky);
+  --color-sky-soft: var(--sky-soft);
+  --color-rule: var(--rule);
+
+  /* 丸文字フォント。Google Fonts から link で読み込み済み */
+  --font-display: "Hachi Maru Pop", "Hiragino Maru Gothic ProN",
+    "Yu Gothic UI", system-ui, sans-serif;
+  --font-handwriting: "Yusei Magic", "Klee One", "Hiragino Maru Gothic ProN",
+    "Yu Gothic UI", cursive;
+  --font-pop: "Mochiy Pop One", "Hachi Maru Pop",
+    "Hiragino Maru Gothic ProN", system-ui, sans-serif;
+  --font-pixel: "DotGothic16", "Hiragino Maru Gothic ProN", monospace;
+  --font-sans: "Klee One", "Yusei Magic", "Hiragino Maru Gothic ProN",
+    system-ui, sans-serif;
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* ── 平成プロフィール帳 装飾ユーティリティ ───────────── */
+
+/* 背景：薄いドット柄 */
+.bg-dots {
+  background-color: var(--paper);
+  background-image: radial-gradient(
+    circle,
+    var(--pink-soft) 1.4px,
+    transparent 1.6px
+  );
+  background-size: 14px 14px;
+  background-position: 0 0;
+}
+
+/* 背景：チェック柄 */
+.bg-gingham {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(45deg, var(--pink-soft) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--pink-soft) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--pink-soft) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--pink-soft) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+/* ストライプボーダー（外枠の二重縁取り） */
+.frame-stripe {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      var(--pink) 0 6px,
+      var(--lavender) 6px 12px,
+      var(--mint) 12px 18px,
+      var(--yellow) 18px 24px,
+      var(--sky) 24px 30px
+    );
+  padding: 6px;
+  border-radius: 24px;
+}
+
+/* 丸太字シャドウ（プリントシール風） */
+.text-pop-shadow {
+  text-shadow:
+    -2px 2px 0 #fff,
+    -3px 3px 0 var(--pink);
+}
+
+.text-pop-shadow-mint {
+  text-shadow:
+    -2px 2px 0 #fff,
+    -3px 3px 0 var(--mint);
+}
+
+.text-pop-shadow-lavender {
+  text-shadow:
+    -2px 2px 0 #fff,
+    -3px 3px 0 var(--lavender);
+}
+
+/* 波線下線：書き込み欄 */
+.wavy-underline {
+  text-decoration: none;
+  background-image: radial-gradient(
+    circle at 50% 100%,
+    var(--pink) 1.5px,
+    transparent 2px
+  );
+  background-repeat: repeat-x;
+  background-size: 6px 6px;
+  background-position: 0 100%;
+  padding-bottom: 3px;
+}
+
+/* 一重下線（手書き風） */
+.line-underline {
+  background-image: linear-gradient(
+    to right,
+    var(--pink) 0,
+    var(--pink) 100%
+  );
+  background-repeat: repeat-x;
+  background-size: 100% 2px;
+  background-position: 0 100%;
+  padding-bottom: 2px;
+}
+
+/* washi tape 風 */
+.washi {
+  position: absolute;
+  width: 84px;
+  height: 22px;
+  background:
+    repeating-linear-gradient(
+      -8deg,
+      rgba(255, 255, 255, 0.5) 0 6px,
+      rgba(255, 255, 255, 0) 6px 12px
+    ),
+    var(--mint);
+  opacity: 0.85;
+  transform: rotate(-12deg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.washi.washi-pink {
+  background:
+    repeating-linear-gradient(
+      -8deg,
+      rgba(255, 255, 255, 0.5) 0 6px,
+      rgba(255, 255, 255, 0) 6px 12px
+    ),
+    var(--pink);
+}
+
+.washi.washi-yellow {
+  background:
+    repeating-linear-gradient(
+      -8deg,
+      rgba(255, 255, 255, 0.5) 0 6px,
+      rgba(255, 255, 255, 0) 6px 12px
+    ),
+    var(--yellow);
+}
+
+.washi.washi-lavender {
+  background:
+    repeating-linear-gradient(
+      -8deg,
+      rgba(255, 255, 255, 0.5) 0 6px,
+      rgba(255, 255, 255, 0) 6px 12px
+    ),
+    var(--lavender);
+}
+
+/* ラベルタグ */
+.tag {
+  display: inline-block;
+  border-radius: 9999px;
+  padding: 2px 12px;
+  font-family: var(--font-pop);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: #fff;
+  box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.08);
+}
+
+.tag-pink {
+  background: var(--pink);
+}
+.tag-mint {
+  background: var(--mint);
+  color: #2a4a3f;
+}
+.tag-lavender {
+  background: var(--lavender);
+}
+.tag-yellow {
+  background: var(--yellow);
+  color: #5a4500;
+}
+.tag-sky {
+  background: var(--sky);
+  color: #1f3f55;
+}
+
+/* アバター枠：太いストライプドーナツ */
+.avatar-frame {
+  background: conic-gradient(
+    var(--pink) 0 25%,
+    var(--mint) 25% 50%,
+    var(--lavender) 50% 75%,
+    var(--yellow) 75% 100%
+  );
+  padding: 6px;
+  border-radius: 9999px;
+  box-shadow: 0 2px 6px rgba(255, 105, 180, 0.25);
+}
+
+/* ジグザグ罫線 */
+.zigzag {
+  --c: var(--pink);
+  background:
+    linear-gradient(135deg, transparent 75%, var(--c) 75%) 0 0 / 10px 10px,
+    linear-gradient(225deg, transparent 75%, var(--c) 75%) 0 0 / 10px 10px,
+    linear-gradient(315deg, transparent 75%, var(--c) 75%) 0 100% / 10px 10px,
+    linear-gradient(45deg, transparent 75%, var(--c) 75%) 0 100% / 10px 10px;
+  background-repeat: repeat-x;
+  height: 10px;
+}
+
+/* ★ 散らばった星デコレーション用 */
+.sparkles::before,
+.sparkles::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
