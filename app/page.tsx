@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { toPng } from "html-to-image";
+import { toBlob, toPng } from "html-to-image";
 
 type FieldKey =
   | "furniture"
@@ -195,6 +195,7 @@ export default function Page() {
   const [avatar, setAvatar] = useState<string | null>(null);
   const [values, setValues] = useState<Record<FieldKey, string>>(initialValues);
   const [exporting, setExporting] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -256,6 +257,95 @@ export default function Page() {
       alert("画像の保存に失敗しちゃった…ごめんね💦");
     } finally {
       setExporting(false);
+    }
+  };
+
+  const generatePreviewBlob = async (): Promise<Blob | null> => {
+    const node = previewRef.current;
+    if (!node) return null;
+    if (typeof document !== "undefined" && document.fonts?.ready) {
+      await document.fonts.ready;
+    }
+    const baseOptions = {
+      pixelRatio: 2,
+      cacheBust: true,
+      backgroundColor: "#ffeef5",
+    };
+    try {
+      return await toBlob(node, baseOptions);
+    } catch (e) {
+      console.warn(
+        "[gogh] font-embedded export failed, retrying with skipFonts:",
+        e
+      );
+      return await toBlob(node, { ...baseOptions, skipFonts: true });
+    }
+  };
+
+  const handleShareToX = async () => {
+    setSharing(true);
+    try {
+      const blob = await generatePreviewBlob();
+      if (!blob) {
+        alert("画像の作成に失敗しちゃった…ごめんね💦");
+        return;
+      }
+      const safeName =
+        (name || "gogh_profile").replace(/[^\p{L}\p{N}_-]/gu, "_") ||
+        "gogh_profile";
+      const file = new File([blob], `${safeName}.png`, { type: "image/png" });
+      const shareText = "gogh プロフ帳メーカーで作ったよ♡ #gogh #プロフ帳";
+      const intentUrl = `https://x.com/intent/post?text=${encodeURIComponent(
+        shareText
+      )}`;
+
+      // 1) Web Share API with files (mainly mobile / supported desktop)
+      const nav = navigator as Navigator & {
+        canShare?: (data: { files?: File[] }) => boolean;
+      };
+      if (
+        typeof nav.share === "function" &&
+        typeof nav.canShare === "function" &&
+        nav.canShare({ files: [file] })
+      ) {
+        try {
+          await nav.share({ files: [file], text: shareText });
+          return;
+        } catch (e) {
+          if ((e as DOMException)?.name === "AbortError") return;
+          console.warn("[gogh] navigator.share failed, falling back:", e);
+        }
+      }
+
+      // 2) Clipboard + open X compose (desktop fallback)
+      if (
+        typeof ClipboardItem !== "undefined" &&
+        navigator.clipboard?.write
+      ) {
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ "image/png": blob }),
+          ]);
+          window.open(intentUrl, "_blank", "noopener,noreferrer");
+          alert(
+            "画像をコピーしたよ✨\nXの投稿画面で Ctrl/⌘ + V で貼ってね💕"
+          );
+          return;
+        } catch (e) {
+          console.warn("[gogh] clipboard write failed:", e);
+        }
+      }
+
+      // 3) Last resort: open X compose, ask user to save manually
+      window.open(intentUrl, "_blank", "noopener,noreferrer");
+      alert(
+        "このブラウザでは画像をそのまま渡せないみたい💦\n「画像で保存」してから添付してね"
+      );
+    } catch (err) {
+      console.error(err);
+      alert("Xへの共有に失敗しちゃった…ごめんね💦");
+    } finally {
+      setSharing(false);
     }
   };
 
@@ -445,6 +535,16 @@ export default function Page() {
               style={{ fontFamily: "var(--font-pop)" }}
             >
               {exporting ? "保存中…" : "❤︎ 画像で保存 ❤︎"}
+            </button>
+            <button
+              type="button"
+              onClick={handleShareToX}
+              disabled={sharing}
+              className="inline-flex items-center gap-2 rounded-full bg-black px-6 py-2.5 font-semibold text-white shadow-md transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              style={{ fontFamily: "var(--font-pop)" }}
+            >
+              <XIcon className="h-4 w-4" />
+              {sharing ? "じゅんび中…" : "Xにそのまま投稿"}
             </button>
             <button
               type="button"
